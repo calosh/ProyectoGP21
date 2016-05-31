@@ -85,7 +85,6 @@ def index(request):
             twett = ""
             twett= twett.join(i[6])
             twett = normalizar_risas(twett)
-            print twett
             usuario = ""
             usuario= usuario.join(i[18])
             nombre = ""
@@ -103,7 +102,6 @@ def index(request):
                 id_tweet = i[0]
                 retweet_count = i[11]
                 favorite_count= 0
-
 
             # Si RT o via @ o # esta al principio se elimina el twett
             if "RT" in twett[0:3] or "via @" in twett or twett[0]=="#":
