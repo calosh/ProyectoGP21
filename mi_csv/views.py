@@ -78,17 +78,26 @@ def index(request):
             twett= twett.join(i[6])
             usuario = ""
             usuario= usuario.join(i[15])
-            datosjson = ""
-            datosjson= datosjson.join(i[32])
-            datosjson = json.loads(datosjson)
-            entities = datosjson['entities']
-            user_mentions = entities['user_mentions']
-            # Algunos campos del json no tienen informacion
+            nombre = ""
             try:
+                datosjson = ""
+                datosjson= datosjson.join(i[32])
+                datosjson = json.loads(datosjson)
+                entities = datosjson['entities']
+                user_mentions = entities['user_mentions']
+                id_tweet = datosjson['id']
+                favorite_count = datosjson['favorite_count']
+                retweet_count = datosjson['retweet_count']
                 aux= user_mentions[0]
                 nombre = aux['name']
             except IndexError:
-                nombre = ""
+                # Algunos campos del json no tienen informacion
+                nombre = "S/N"
+            except Exception:
+                id_tweet = 0
+                favorite_count= 0
+                retweet_count = 0
+
 
             # Si RT o via @ o # esta al principio se elimina el twett
             if "RT" in twett[0:3] or "via @" in twett or twett[0]=="#":
@@ -110,7 +119,7 @@ def index(request):
                         cont=cont+1;
                         print "%d %s" %(cont, twett)
                         # Se impimer el twett
-                        writer.writerow([datosjson['id'],twett,usuario, datosjson['favorite_count'], datosjson['retweet_count'], nombre])
+                        writer.writerow([id_tweet,twett,usuario, favorite_count, retweet_count, nombre.encode('utf8')])
                         
                 # Si hay una url en el twett pero no en la base de datos
                 elif "http" in twett:
@@ -132,14 +141,14 @@ def index(request):
                             twett=eliminarMenciones(twett)
                             cont=cont+1;
                             print "%d %s" %(cont, twett)
-                            writer.writerow([datosjson['id'],twett,usuario, datosjson['favorite_count'], datosjson['retweet_count'], nombre])
+                            writer.writerow([id_tweet,twett,usuario, favorite_count, retweet_count, nombre.encode('utf8')])
                     # Si no se encuentra la url en el twett
                     except Exception:
                         twett=eliminar_urls(twett)
                         twett=eliminarMenciones(twett)
                         cont=cont+1;
                         print "%d %s" %(cont, twett)
-                        writer.writerow([datosjson['id'],twett,usuario, datosjson['favorite_count'], datosjson['retweet_count'], nombre])
+                        writer.writerow([id_tweet,twett,usuario, favorite_count, retweet_count, nombre.encode('utf8')])
 
                 else:
                     # Se imprimer el twett
@@ -147,7 +156,7 @@ def index(request):
                     twett=eliminarMenciones(twett)
                     cont=cont+1;
                     print "%d %s" %(cont, twett)
-                    writer.writerow([datosjson['id'],twett,usuario, datosjson['favorite_count'], datosjson['retweet_count'], nombre])
+                    writer.writerow([id_tweet,twett,usuario, favorite_count, retweet_count, nombre.encode('utf8')])
         return res
 
     return render(request, "index.html", locals())
