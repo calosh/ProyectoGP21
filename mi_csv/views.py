@@ -11,6 +11,8 @@ import codecs
 import re
 
 import json
+from bs4 import BeautifulSoup
+from urllib import urlopen
 
 def eliminarMenciones(cadena):
     bandera = True
@@ -69,34 +71,32 @@ def index(request):
         csvfile = request.FILES['csv_file']
         dialect = csv.Sniffer().sniff(codecs.EncodedFile(csvfile, "utf-8").read(1024))
         csvfile.open()
+        # https://docs.python.org/3/library/csv.html#csv.reader
+        # https://slaptijack.com/programming/python-csv-error-on-new-line-character-in-unquoted-field/
         reader = csv.reader(codecs.EncodedFile(csvfile, "utf-8"), delimiter=',', dialect=dialect)
         rows = list(reader)
-        #print rows[0]
+        #print rows
         cont = 0
         for i in rows:
             twett = ""
             twett= twett.join(i[6])
             usuario = ""
-            usuario= usuario.join(i[15])
+            usuario= usuario.join(i[18])
             nombre = ""
+            nombre = nombre.join(i[31])
+            retweet_count=0
             try:
                 datosjson = ""
                 datosjson= datosjson.join(i[32])
                 datosjson = json.loads(datosjson)
                 entities = datosjson['entities']
-                user_mentions = entities['user_mentions']
-                id_tweet = datosjson['id']
+                id_tweet = i[0]
                 favorite_count = datosjson['favorite_count']
-                retweet_count = datosjson['retweet_count']
-                aux= user_mentions[0]
-                nombre = aux['name']
-            except IndexError:
-                # Algunos campos del json no tienen informacion
-                nombre = "S/N"
+                retweet_count = i[11]
             except Exception:
-                id_tweet = 0
+                id_tweet = i[0]
+                retweet_count = i[11]
                 favorite_count= 0
-                retweet_count = 0
 
 
             # Si RT o via @ o # esta al principio se elimina el twett
@@ -107,15 +107,19 @@ def index(request):
                 twett = eliminar_emoticons(twett)
                 # Si el twett tiene http y el campo de la base de datos url es diferente de vacio
                 if "http" in twett and i[24]!="":
-                    response = urllib2.urlopen(i[24])
-                    html = response.read()
+                    #response = urllib2.urlopen(i[24])
+                    #html = response.read()
+                    url = i[24]
+                    # http://stackoverflow.com/questions/22004093/python-beautifulsoup-picking-webpages-same-codes-working-on-and-off
+                    soup = BeautifulSoup(urlopen(url),"html.parser")
+                    body = soup.find('body')
+                    # Elimino la url del tweet
+                    twett=eliminarMenciones(twett)
+                    twett=eliminar_urls(twett)
                     # Si se encuentra una coincidencia del twett con el contenido de la url
-                    if twett[3:20] in html:
+                    if twett in body:
                         pass
                     else:
-                        # Elimino la url del tweet
-                        twett=eliminarMenciones(twett)
-                        twett=eliminar_urls(twett)
                         cont=cont+1;
                         print "%d %s" %(cont, twett)
                         # Se impimer el twett
@@ -130,17 +134,19 @@ def index(request):
                         if "'" in url:
                             url = url.replace("'","")
 
-                        response = urllib2.urlopen(url)
-                        html = response.read()
+                        #response = urllib2.urlopen(url)
+                        #html = response.read()
+                        soup = BeautifulSoup(urlopen(url),"html.parser")
+                        body = soup.find('body')
+                        # Elimino la url del tweet
+                        twett=eliminar_urls(twett)
+                        twett=eliminarMenciones(twett)
+                        cont=cont+1;
+                        print "%d %s" %(cont, twett)
 
-                        if twett[3:20] in html:
+                        if twett in body:
                             pass
                         else:
-                            # Elimino la url del tweet
-                            twett=eliminar_urls(twett)
-                            twett=eliminarMenciones(twett)
-                            cont=cont+1;
-                            print "%d %s" %(cont, twett)
                             writer.writerow([id_tweet,twett,usuario, favorite_count, retweet_count, nombre.encode('utf8')])
                     # Si no se encuentra la url en el twett
                     except Exception:
