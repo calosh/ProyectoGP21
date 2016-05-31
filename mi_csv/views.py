@@ -59,6 +59,10 @@ def normalizar_palabras(text):
     # http://stackoverflow.com/questions/10982240/how-can-i-remove-duplicate-letters-in-strings
     return re.sub(r'(\w)\1+', r'\1', text)
 
+def normalizar_risas(text):
+    texto = normalizar_palabras(text)
+    return re.sub(r'(j[aeiou]|j)+','jaja', texto, flags=re.I)
+
 
 def index(request):
     res = HttpResponse(content_type='text/csv')
@@ -80,6 +84,8 @@ def index(request):
         for i in rows:
             twett = ""
             twett= twett.join(i[6])
+            twett = normalizar_risas(twett)
+            print twett
             usuario = ""
             usuario= usuario.join(i[18])
             nombre = ""
