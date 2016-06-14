@@ -20,5 +20,7 @@ from mi_csv import views
 
 urlpatterns = [
     #url(r'^admin/', admin.site.urls),
-    url(r'^$', views.index, name="index"),
+    url(r'^$', views.url_lista, name="url_lista"),
+    url(r'^normalizar$', views.index_normalizacion, name="index_normalizacion"),
+    url(r'^sentiwordnet$', views.index_sentiwordnet, name="index_sentiwordnet"),
 ]

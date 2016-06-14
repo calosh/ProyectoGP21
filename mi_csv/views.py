@@ -14,6 +14,19 @@ import json
 from bs4 import BeautifulSoup
 from urllib import urlopen
 
+#from translate import Translator
+from textblob import TextBlob
+
+
+import nltk
+from nltk.wsd import lesk
+from nltk.corpus import wordnet as wn
+from nltk.corpus import sentiwordnet as swn
+from nltk.stem.snowball import SnowballStemmer
+from nltk.tokenize import TweetTokenizer
+
+
+
 def eliminarMenciones(cadena):
     bandera = True
     while(bandera):
@@ -28,7 +41,6 @@ def eliminarMenciones(cadena):
             bandera=False
     cadena = cadena.replace("#", "")
     cadena = cadena.replace("\n", "")
-    #print cadena
     return cadena
 
 def eliminar_emoticons(text):
@@ -64,7 +76,11 @@ def normalizar_risas(text):
     return re.sub(r'(j[aeiou]|j)+','jaja', texto, flags=re.I)
 
 
-def index(request):
+def url_lista(request):
+    return render(request, "lista.html")
+
+
+def index_normalizacion(request):
     res = HttpResponse(content_type='text/csv')
     res['Content-Disposition'] = 'attachment; filename=listado.csv'
     writer = csv.writer(res)
@@ -170,3 +186,89 @@ def index(request):
         return res
 
     return render(request, "index.html", locals())
+
+
+def index_sentiwordnet(request):
+    res = HttpResponse(content_type='text/csv')
+    res['Content-Disposition'] = 'attachment; filename=listado.csv'
+    writer = csv.writer(res)
+    #writer.writerow(['id','Tweets','Usuario','Numero Favoritos','Numero Retweets','Nombre'])
+    # 'POS','ROOT','Positivity score','Negativity score','Objectivity score'
+    writer.writerow(['Tweet Original','Tweet Traducido','POS','ROOT','Positivity Score','Negativity Score','Objectivity Score'])
+
+    if request.POST and request.FILES:
+        #http://www.thuydienthacba.com/questions/4576059/getting-type-error-while-opening-an-uploaded-csv-file
+        csvfile = request.FILES['csv_file'].open()  # http://stackoverflow.com/questions/10617286/getting-type-error-while-opening-an-uploaded-csv-file
+        #portfolio = csv.DictReader(paramFile)
+        portfolio = csv.DictReader(request.FILES['csv_file'].file)
+
+        #print(gs.translate('hello world', 'de'))
+        for i in portfolio:
+            twett = ""
+            twett= twett.join(i['Tweets']).decode('utf8')
+            #translation = translator.translate(twett)
+            print twett
+
+            b = TextBlob(twett)
+            traduccion = ""
+            traduccion = traduccion.join(b.translate(to="en"))
+            tokens = nltk.word_tokenize(traduccion)
+            print traduccion
+            print type(traduccion)
+            tagged = nltk.pos_tag(tokens)
+            #print tagged
+
+            stemmer = SnowballStemmer("english")
+            # Tokenizar
+            tknzr = TweetTokenizer()
+            text_token = tknzr.tokenize(traduccion)
+            text_token2 = []
+
+            # Raiz de cada palabra en text_token2
+            for i in text_token:
+                aux = stemmer.stem(i)
+                text_token2.append(aux)
+
+            print text_token2
+            print tokens
+
+            cont = 0
+            pos_score = 0
+            neg_score = 0
+            obj_score = 0
+            for i in text_token2:
+                # si la raiz existe en el diccionario
+                n = (lesk(text_token2, i, 'n'))
+                if n:
+                    x = n.name()
+                    #print wn.synset(x).definition()
+                    breakdown = swn.senti_synset(x)
+                    pos_score = pos_score + breakdown.pos_score()
+                    neg_score = neg_score + breakdown.neg_score()
+                    obj_score = obj_score + breakdown.obj_score()
+                    cont = cont+1
+                elif n==None:
+                    # Buscanos la palabra original en el diccionario
+                    try:
+                        n = (lesk(text_token2, text_token[cont], 'n'))
+                        x = n.name()
+                        breakdown = swn.senti_synset(x)
+                        pos_score = pos_score + breakdown.pos_score()
+                        neg_score = neg_score + breakdown.neg_score()
+                        obj_score = obj_score + breakdown.obj_score()
+
+                        cont = cont + 1
+                    except AttributeError:
+                        cont = cont + 1
+                else:
+                    # La palabara no existe en el diccionario
+                    cont = cont + 1
+
+            print "La positividad es: %f" %pos_score
+            print "La negatividad es: %f" %neg_score
+            print "La objetividad es: %f" %obj_score
+            # ,json.dumps(tagged),json.dumps(text_token2),pos_score,neg_score,obj_score
+            writer.writerow([twett.encode('utf-8'),traduccion.encode('utf-8'), json.dumps(tagged),json.dumps(text_token2),pos_score,neg_score,obj_score])
+        return res
+
+    return render(request, "index2.html", locals())

@@ -1,0 +1,23 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CSV</title>
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" type="text/css">
+
+</head>
+<body>
+
+<div class="container">
+    <h1>Opciones:</h1>
+    <ul>
+        <li><a href="{% url 'index_normalizacion' %}">Normalizar Tweets</a></li>
+        <li><a href="{% url 'index_sentiwordnet' %}">Analizar con sentiwordnet</a></li>
+    </ul>
+</div>
+
+
+<script src="{% static "js/bootstrap.min.js" %}"></script>
+</body>
+</html>
