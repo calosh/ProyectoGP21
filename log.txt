@@ -1,0 +1,35 @@
+commit 80733306e4e7a83a49f64296fc83cb47c2ea3cdb
+Author: Carlos Tacuri <carlitoshxt@gmail.com>
+Date:   Tue Jun 14 18:05:40 2016 -0500
+
+    Se agrego Sentiwordnet
+
+commit 1fdf800def9d0cec48d90342f6a93600726838d4
+Author: Carlos Tacuri <carlitoshxt@gmail.com>
+Date:   Tue May 31 18:07:32 2016 -0500
+
+    Normalizar Risa
+
+commit 4f6b49eb7eb0a62c3feeae0dba912927a5d44764
+Author: Carlos Tacuri <carlitoshxt@gmail.com>
+Date:   Tue May 31 18:05:01 2016 -0500
+
+    Normalizar risa
+
+commit dbd829f69c891c939a3d91f520ffab64434531a1
+Author: Carlos Tacuri <carlitoshxt@gmail.com>
+Date:   Tue May 31 11:16:09 2016 -0500
+
+    Cambio a beautifulsoup4
+
+commit bbbea1683b7b519efd31598e488abb3c3489063c
+Author: Carlos Tacuri <carlitoshxt@gmail.com>
+Date:   Mon May 30 21:31:07 2016 -0500
+
+    Primer commit
+
+commit 0881058b97cdfc33b3ef6bbf2ac38251aee9be5e
+Author: Carlos Tacuri <carlitoshxt@gmail.com>
+Date:   Mon May 30 07:19:09 2016 -0500
+
+    Version 2

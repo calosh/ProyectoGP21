@@ -1,31 +1,25 @@
 # -*- coding: utf-8 -*-
+import sys
+reload(sys)
+sys.setdefaultencoding("utf-8")
+
 from django.shortcuts import render
 # Create your views here.
 
 from django.http import HttpResponse
 from django.core.files import File
 
+import urllib
 import urllib2
 import csv
 import codecs
 import re
 
 import json
+#import simplejson as json
+
 from bs4 import BeautifulSoup
 from urllib import urlopen
-
-#from translate import Translator
-from textblob import TextBlob
-
-
-import nltk
-from nltk.wsd import lesk
-from nltk.corpus import wordnet as wn
-from nltk.corpus import sentiwordnet as swn
-from nltk.stem.snowball import SnowballStemmer
-from nltk.tokenize import TweetTokenizer
-
-
 
 def eliminarMenciones(cadena):
     bandera = True
@@ -40,7 +34,8 @@ def eliminarMenciones(cadena):
         else:
             bandera=False
     cadena = cadena.replace("#", "")
-    cadena = cadena.replace("\n", "")
+    cadena = cadena.replace("\n", " ")
+    cadena = cadena.replace("-", " ")
     return cadena
 
 def eliminar_emoticons(text):
@@ -100,7 +95,7 @@ def index_normalizacion(request):
         for i in rows:
             twett = ""
             twett= twett.join(i[6])
-            twett = normalizar_risas(twett)
+            #twett = normalizar_risas(twett)
             usuario = ""
             usuario= usuario.join(i[18])
             nombre = ""
@@ -141,6 +136,7 @@ def index_normalizacion(request):
                         pass
                     else:
                         cont=cont+1;
+                        #twett=normalizar_risas(twett)
                         print "%d %s" %(cont, twett)
                         # Se impimer el twett
                         writer.writerow([id_tweet,twett,usuario, favorite_count, retweet_count, nombre.encode('utf8')])
@@ -167,6 +163,7 @@ def index_normalizacion(request):
                         if twett in body:
                             pass
                         else:
+                            #twett=normalizar_risas(twett)
                             writer.writerow([id_tweet,twett,usuario, favorite_count, retweet_count, nombre.encode('utf8')])
                     # Si no se encuentra la url en el twett
                     except Exception:
@@ -174,6 +171,7 @@ def index_normalizacion(request):
                         twett=eliminarMenciones(twett)
                         cont=cont+1;
                         print "%d %s" %(cont, twett)
+                        #twett=normalizar_risas(twett)
                         writer.writerow([id_tweet,twett,usuario, favorite_count, retweet_count, nombre.encode('utf8')])
 
                 else:
@@ -182,10 +180,56 @@ def index_normalizacion(request):
                     twett=eliminarMenciones(twett)
                     cont=cont+1;
                     print "%d %s" %(cont, twett)
+                    #twett=normalizar_risas(twett)
                     writer.writerow([id_tweet,twett,usuario, favorite_count, retweet_count, nombre.encode('utf8')])
         return res
 
     return render(request, "index.html", locals())
+
+def opener(s):
+    params = {}
+    params['input']=s
+    params['kaf']='true'
+    params = urllib.urlencode(params)
+    f = urllib.urlopen("http://localhost:9293/", params)
+
+    # pos-tagger
+    s = f.read()
+    params = {}
+    params['input']=s
+    params['kaf']='true'
+    params = urllib.urlencode(params)
+    f = urllib.urlopen("http://localhost:9294/", params)
+
+    # polarity-tagger
+    s = f.read()
+    params = {}
+    params['input']=s
+    params['kaf']='true'
+    params = urllib.urlencode(params)
+    f = urllib.urlopen("http://localhost:9295/", params)
+
+    # opinion-detector-basic
+    s = f.read()
+    params = {}
+    params['input']=s
+    params['kaf']='true'
+    params = urllib.urlencode(params)
+    f = urllib.urlopen("http://localhost:9296/", params)
+
+    # kaf2json
+    s = f.read()
+    params = {}
+    params['input']=s
+    params['kaf']='true'
+    params = urllib.urlencode(params)
+    f = urllib.urlopen("http://localhost:9297/", params)
+
+    lista_opener = f.read()
+    lista=json.loads(lista_opener)
+    #print lista['opinions']
+    #print lista['sentiments']
+    return lista
 
 
 def index_sentiwordnet(request):
@@ -194,7 +238,7 @@ def index_sentiwordnet(request):
     writer = csv.writer(res)
     #writer.writerow(['id','Tweets','Usuario','Numero Favoritos','Numero Retweets','Nombre'])
     # 'POS','ROOT','Positivity score','Negativity score','Objectivity score'
-    writer.writerow(['Tweet Original','Tweet Traducido','POS','ROOT','Positivity Score','Negativity Score','Objectivity Score'])
+    writer.writerow(['Tweet Original','Polaridad'])
 
     if request.POST and request.FILES:
         #http://www.thuydienthacba.com/questions/4576059/getting-type-error-while-opening-an-uploaded-csv-file
@@ -205,70 +249,26 @@ def index_sentiwordnet(request):
         #print(gs.translate('hello world', 'de'))
         for i in portfolio:
             twett = ""
-            twett= twett.join(i['Tweets']).decode('utf8')
+            twett= twett.join(i['Tweets'])
             #translation = translator.translate(twett)
             print twett
 
-            b = TextBlob(twett)
-            traduccion = ""
-            traduccion = traduccion.join(b.translate(to="en"))
-            tokens = nltk.word_tokenize(traduccion)
-            print traduccion
-            print type(traduccion)
-            tagged = nltk.pos_tag(tokens)
-            #print tagged
+            s = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                <KAF xml:lang="es" version="2.1">
+                  <raw>"""+twett+"""</raw>
+                </KAF>"""
 
-            stemmer = SnowballStemmer("english")
-            # Tokenizar
-            tknzr = TweetTokenizer()
-            text_token = tknzr.tokenize(traduccion)
-            text_token2 = []
-
-            # Raiz de cada palabra en text_token2
-            for i in text_token:
-                aux = stemmer.stem(i)
-                text_token2.append(aux)
-
-            print text_token2
-            print tokens
-
-            cont = 0
-            pos_score = 0
-            neg_score = 0
-            obj_score = 0
-            for i in text_token2:
-                # si la raiz existe en el diccionario
-                n = (lesk(text_token2, i, 'n'))
-                if n:
-                    x = n.name()
-                    #print wn.synset(x).definition()
-                    breakdown = swn.senti_synset(x)
-                    pos_score = pos_score + breakdown.pos_score()
-                    neg_score = neg_score + breakdown.neg_score()
-                    obj_score = obj_score + breakdown.obj_score()
-                    cont = cont+1
-                elif n==None:
-                    # Buscanos la palabra original en el diccionario
-                    try:
-                        n = (lesk(text_token2, text_token[cont], 'n'))
-                        x = n.name()
-                        breakdown = swn.senti_synset(x)
-                        pos_score = pos_score + breakdown.pos_score()
-                        neg_score = neg_score + breakdown.neg_score()
-                        obj_score = obj_score + breakdown.obj_score()
-
-                        cont = cont + 1
-                    except AttributeError:
-                        cont = cont + 1
-                else:
-                    # La palabara no existe en el diccionario
-                    cont = cont + 1
-
-            print "La positividad es: %f" %pos_score
-            print "La negatividad es: %f" %neg_score
-            print "La objetividad es: %f" %obj_score
-            # ,json.dumps(tagged),json.dumps(text_token2),pos_score,neg_score,obj_score
-            writer.writerow([twett.encode('utf-8'),traduccion.encode('utf-8'), json.dumps(tagged),json.dumps(text_token2),pos_score,neg_score,obj_score])
+            lista_opener = opener(s)
+            polaridad = ""
+            try:
+                print lista_opener['sentiments']
+                polaridad = json.dumps(lista_opener['sentiments']).decode('utf-8')
+            except KeyError:
+                polaridad = ""
+            
+            #polaridad = lista_opener['sentiments']
+            #print polaridad['polarity']
+            writer.writerow([twett.encode('utf-8'),polaridad])
         return res
 
     return render(request, "index2.html", locals())
