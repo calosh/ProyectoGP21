@@ -24,6 +24,14 @@
     </form>
 </div>
 <div class="container">
+    <p>Se necesita ejecutar los siguientes sercios de opener:</p>
+    <ul>
+        <li>tokenizer-server -p 9293</li>
+        <li>pos-tagger-server -p 9294</li>
+        <li>polarity-tagger-server -p 9295</li>
+        <li>opinion-detector-basic-server -p 9296</li>
+        <li>kaf2json-server -p 9297</li>
+    </ul>
     <a href="{% url 'url_lista' %}" class="btn btn-default">Regresar</a>
 </div>
 
