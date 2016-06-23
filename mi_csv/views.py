@@ -38,6 +38,20 @@ def eliminarMenciones(cadena):
     cadena = cadena.replace("-", " ")
     return cadena
 
+def eliminarUltimoHastag(text):
+    i = len(text)-1
+    j=0
+    cadena = ""
+    lista = []
+    while j<=i and text[i]!=" ":
+        lista.append(text[i])
+        i-=1
+    cadena = cadena.join(lista)
+    if cadena[-1]=="#":
+        return 1
+    else:
+        return 0
+
 def eliminar_emoticons(text):
     # http://stackoverflow.com/questions/26568722/remove-unicode-emoji-using-re-in-python
     try:
@@ -115,7 +129,7 @@ def index_normalizacion(request):
                 favorite_count= 0
 
             # Si RT o via @ o # esta al principio se elimina el twett
-            if "RT" in twett[0:3] or "via @" in twett or twett[0]=="#":
+            if "RT" in twett[0:3] or "via @" in twett or twett[0]=="#" or eliminarUltimoHastag(twett)==1:
                 pass
             else:
                 # Eliminio emoticons
@@ -128,11 +142,13 @@ def index_normalizacion(request):
                     # http://stackoverflow.com/questions/22004093/python-beautifulsoup-picking-webpages-same-codes-working-on-and-off
                     soup = BeautifulSoup(urlopen(url),"html.parser")
                     body = soup.find('body')
+
                     # Elimino la url del tweet
                     twett=eliminarMenciones(twett)
                     twett=eliminar_urls(twett)
                     # Si se encuentra una coincidencia del twett con el contenido de la url
-                    if twett in body:
+                    busqueda_tweet = body.find(twett)
+                    if busqueda_tweet!=-1:
                         pass
                     else:
                         cont=cont+1;
