@@ -76,14 +76,13 @@ def eliminar_urls(text):
     text = re.sub(url_patron, '', text)
     return text
 
+
 def normalizar_palabras(text):
     # http://stackoverflow.com/questions/10982240/how-can-i-remove-duplicate-letters-in-strings
-    return re.sub(r'(\w)\1+', r'\1', text)
-
-def normalizar_risas(text):
-    texto = normalizar_palabras(text)
-    return re.sub(r'(j[aeiou]|j)+','jaja', texto, flags=re.I)
-
+    texto = re.sub(r'(\w)\1+', r'\1', text) # NOrmalizar Palabras gooool-->gol
+    # http://stackoverflow.com/questions/16453522/how-can-i-detect-laughing-words-in-a-string/16453690#16453690
+    # Normalizar risas jajajaj o ejejej --> jaja
+    return = re.sub(r'\b(?:(a|e|i|o|u)*(?:ja|je|ji|jo|ju)+j?|(?:j+(a|e|i|o|u)+)+j+)\b','jaja',texto, flags=re.I)
 
 def url_lista(request):
     return render(request, "lista.html")
@@ -109,7 +108,7 @@ def index_normalizacion(request):
         for i in rows:
             twett = ""
             twett= twett.join(i[6])
-            #twett = normalizar_risas(twett)
+            twett = normalizar_palabras(twett)
             usuario = ""
             usuario= usuario.join(i[18])
             nombre = ""
