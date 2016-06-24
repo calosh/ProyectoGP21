@@ -82,7 +82,7 @@ def normalizar_palabras(text):
     texto = re.sub(r'(\w)\1+', r'\1', text) # NOrmalizar Palabras gooool-->gol
     # http://stackoverflow.com/questions/16453522/how-can-i-detect-laughing-words-in-a-string/16453690#16453690
     # Normalizar risas jajajaj o ejejej --> jaja
-    return = re.sub(r'\b(?:(a|e|i|o|u)*(?:ja|je|ji|jo|ju)+j?|(?:j+(a|e|i|o|u)+)+j+)\b','jaja',texto, flags=re.I)
+    return re.sub(r'\b(?:(a|e|i|o|u)*(?:ja|je|ji|jo|ju)+j?|(?:j+(a|e|i|o|u)+)+j+)\b','jaja',text, flags=re.I)
 
 def url_lista(request):
     return render(request, "lista.html")
