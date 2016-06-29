@@ -21,6 +21,22 @@ import json
 from bs4 import BeautifulSoup
 from urllib import urlopen
 
+from nltk.tokenize import TweetTokenizer
+from diccionario import palabras
+
+tknzr = TweetTokenizer()
+def reemplazarAbbrPorPalabra(text):
+    tokens = tknzr.tokenize(text)
+    for i in palabras:
+        for j in palabras[i]:
+            #print j
+            aux = " "+j
+            aux2 = j+" "
+            if j in tokens:
+                text = text.replace(j,i)
+                break
+    return text
+
 def eliminarMenciones(cadena):
     bandera = True
     while(bandera):
@@ -85,8 +101,10 @@ def eliminar_urls(text):
 
 
 def normalizar_palabras(text):
+    text = reemplazarAbbrPorPalabra(text)
     # http://stackoverflow.com/questions/10982240/how-can-i-remove-duplicate-letters-in-strings
-    texto = re.sub(r'(\w)\1+', r'\1', text) # NOrmalizar Palabras gooool-->gol
+    # text = re.sub(r'(\w)\1+', r'\1', text) # NOrmalizar Palabras gooool-->gol
+    
     # http://stackoverflow.com/questions/16453522/how-can-i-detect-laughing-words-in-a-string/16453690#16453690
     # Normalizar risas jajajaj o ejejej --> jaja
     return re.sub(r'\b(?:(a|e|i|o|u)*(?:ja|je|ji|jo|ju)+j?|(?:j+(a|e|i|o|u)+)+j+)\b','jaja',text, flags=re.I)
@@ -114,13 +132,24 @@ def index_normalizacion(request):
         cont = 0
         for i in rows:
             twett = ""
-            twett= twett.join(i[6])
-            twett = normalizar_palabras(twett)
+            try:
+                twett= twett.join(i[6])
+                twett = normalizar_palabras(twett)
+            except IndexError, e:
+                continue
+            
             usuario = ""
-            usuario= usuario.join(i[18])
+            try:
+                usuario= usuario.join(i[18])
+            except IndexError:
+                usuario = "S/U"
+
             nombre = ""
-            nombre = nombre.join(i[31])
-            retweet_count=0
+            try:
+                nombre = nombre.join(i[31])
+            except IndexError:
+                nombre = "S/N"
+              
             try:
                 datosjson = ""
                 datosjson= datosjson.join(i[32])
@@ -128,18 +157,27 @@ def index_normalizacion(request):
                 entities = datosjson['entities']
                 id_tweet = i[0]
                 favorite_count = datosjson['favorite_count']
-                retweet_count = i[11]
             except Exception:
                 id_tweet = i[0]
-                retweet_count = i[11]
                 favorite_count= 0
 
-            # Si RT o via @ o # esta al principio se elimina el twett
-            if "RT" in twett[0:3] or "via @" in twett or "vía @" in twett or twett[0]=="#" or eliminarUltimoHastag(twett)==1:
+            retweet_count=0
+            try:
+                retweet_count = i[11]
+            except IndexError:
+                retweet_count = 0
+
+            # Si no existe twett
+            if len(twett)<5:
+                # twett vacio, fijamos twett = "via @" para terminar el proceso
+                twett = "vía @"
+
+            # Si RT o via @ o # esta al principio se elimina el twett Vía Gcgisela
+            if "RT" in twett[0:3] or "via @" in twett or "vía @" in twett or "Vía @" in twett or twett[0]=="#" or eliminarUltimoHastag(twett)==1:
                 pass
             else:
                 # Eliminio emoticons
-                twett = eliminar_emoticons(twett)
+                #twett = eliminar_emoticons(twett)
                 # Si el twett tiene http y el campo de la base de datos url es diferente de vacio
                 if "http" in twett and i[24]!="":
                     #response = urllib2.urlopen(i[24])
@@ -147,6 +185,7 @@ def index_normalizacion(request):
                     url = i[24]
                     # http://stackoverflow.com/questions/22004093/python-beautifulsoup-picking-webpages-same-codes-working-on-and-off
                     soup = BeautifulSoup(urlopen(url),"html.parser")
+                    title = soup.find('title')
                     body = soup.find('body')
 
                     # Elimino la url del tweet
@@ -154,7 +193,8 @@ def index_normalizacion(request):
                     twett=eliminarMenciones(twett)
                     # Si se encuentra una coincidencia del twett con el contenido de la url
                     busqueda_tweet = body.find(twett)
-                    if busqueda_tweet!=-1:
+                    busqueda_tweet2 = title.find(twett)
+                    if busqueda_tweet!=-1 or busqueda_tweet2!=-1:
                         pass
                     else:
                         cont=cont+1;
@@ -179,12 +219,14 @@ def index_normalizacion(request):
                         # Elimino la url del tweet
                         twett=eliminar_urls(twett)
                         twett=eliminarMenciones(twett)
-                        cont=cont+1;
-                        print "%d %s" %(cont, twett)
 
-                        if twett in body:
+                        busqueda_tweet = body.find(twett)
+                        busqueda_tweet2 = title.find(twett)
+                        if busqueda_tweet!=-1 or busqueda_tweet2!=-1:
                             pass
                         else:
+                            cont=cont+1;
+                            print "%d %s" %(cont, twett)
                             #twett=normalizar_risas(twett)
                             writer.writerow([id_tweet,twett,usuario, favorite_count, retweet_count, nombre.encode('utf8')])
                     # Si no se encuentra la url en el twett
