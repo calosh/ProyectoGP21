@@ -22,7 +22,7 @@ from bs4 import BeautifulSoup
 from urllib import urlopen
 
 from nltk.tokenize import TweetTokenizer
-from diccionario import palabras
+from diccionario import palabras,emoticons
 
 tknzr = TweetTokenizer()
 def reemplazarAbbrPorPalabra(text):
@@ -36,6 +36,14 @@ def reemplazarAbbrPorPalabra(text):
                 text = text.replace(j,i)
                 break
     return text
+
+def reemplazarEmoticon(text):
+    for i in emoticons:
+        if i in text:
+            return emoticons[i]
+            break
+    return
+
 
 def eliminarMenciones(cadena):
     bandera = True
@@ -117,7 +125,7 @@ def index_normalizacion(request):
     res = HttpResponse(content_type='text/csv')
     res['Content-Disposition'] = 'attachment; filename=listado.csv'
     writer = csv.writer(res)
-    writer.writerow(['id','Tweets','Usuario','Numero Favoritos','Numero Retweets','Nombre'])
+    writer.writerow(['id','Tweets','Usuario','Numero Favoritos','Numero Retweets','Nombre','Emoticons'])
 
     if request.POST and request.FILES:
 
@@ -137,7 +145,7 @@ def index_normalizacion(request):
                 twett = normalizar_palabras(twett)
             except IndexError, e:
                 continue
-            
+
             usuario = ""
             try:
                 usuario= usuario.join(i[18])
@@ -167,6 +175,10 @@ def index_normalizacion(request):
             except IndexError:
                 retweet_count = 0
 
+            emj = reemplazarEmoticon(twett)
+            if(emj==None):
+                emj = ""
+
             # Si no existe twett
             if len(twett)<5:
                 # twett vacio, fijamos twett = "via @" para terminar el proceso
@@ -190,6 +202,7 @@ def index_normalizacion(request):
 
                     # Elimino la url del tweet
                     twett=eliminar_urls(twett)
+                    twett=eliminarUltimoHastag(twett)
                     twett=eliminarMenciones(twett)
                     # Si se encuentra una coincidencia del twett con el contenido de la url
                     busqueda_tweet = body.find(twett)
@@ -201,7 +214,7 @@ def index_normalizacion(request):
                         #twett=normalizar_risas(twett)
                         print "%d %s" %(cont, twett)
                         # Se impimer el twett
-                        writer.writerow([id_tweet,twett,usuario, favorite_count, retweet_count, nombre.encode('utf8')])
+                        writer.writerow([id_tweet,twett,usuario, favorite_count, retweet_count, nombre.encode('utf8'),emj])
                         
                 # Si hay una url en el twett pero no en la base de datos
                 elif "http" in twett:
@@ -218,6 +231,7 @@ def index_normalizacion(request):
                         body = soup.find('body')
                         # Elimino la url del tweet
                         twett=eliminar_urls(twett)
+                        twett=eliminarUltimoHastag(twett)
                         twett=eliminarMenciones(twett)
 
                         busqueda_tweet = body.find(twett)
@@ -225,27 +239,37 @@ def index_normalizacion(request):
                         if busqueda_tweet!=-1 or busqueda_tweet2!=-1:
                             pass
                         else:
-                            cont=cont+1;
+                            cont=cont+1
                             print "%d %s" %(cont, twett)
+                            emj = reemplazarEmoticon(twett)
+                            if(emj==None):
+                                emj = ""
                             #twett=normalizar_risas(twett)
-                            writer.writerow([id_tweet,twett,usuario, favorite_count, retweet_count, nombre.encode('utf8')])
+                            writer.writerow([id_tweet,twett,usuario, favorite_count, retweet_count, nombre.encode('utf8'),emj])
                     # Si no se encuentra la url en el twett
                     except Exception:
                         twett=eliminar_urls(twett)
+                        twett=eliminarUltimoHastag(twett)
                         twett=eliminarMenciones(twett)
                         cont=cont+1;
                         print "%d %s" %(cont, twett)
+                        emj = reemplazarEmoticon(twett)
+                        if(emj==None):
+                            emj = ""
                         #twett=normalizar_risas(twett)
-                        writer.writerow([id_tweet,twett,usuario, favorite_count, retweet_count, nombre.encode('utf8')])
+                        writer.writerow([id_tweet,twett,usuario, favorite_count, retweet_count, nombre.encode('utf8'),emj])
 
                 else:
                     # Se imprimer el twett
                     twett=eliminar_urls(twett)
+                    twett=eliminarUltimoHastag(twett)
                     twett=eliminarMenciones(twett)
-                    cont=cont+1;
+                    cont=cont+1
+                    if(emj==None):
+                        emj = ""
                     print "%d %s" %(cont, twett)
                     #twett=normalizar_risas(twett)
-                    writer.writerow([id_tweet,twett,usuario, favorite_count, retweet_count, nombre.encode('utf8')])
+                    writer.writerow([id_tweet,twett,usuario, favorite_count, retweet_count, nombre.encode('utf8'),emj])
         return res
 
     return render(request, "index.html", locals())

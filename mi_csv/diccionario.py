@@ -28,9 +28,10 @@ palabras = {"siempre": ['100pre',"always"],
             "dedos": ["d2","fingers"],
             "decir": ["dcr","to say"],
             "difícil": ["dfcl","difficult"],
-            "hemos": ["dim","We have"],
-            "dónde": ["ems","where"],
-            "eres tú": ["ers","to say","ers2"],
+            "hemos": ["ems","We have"],
+            "dónde": ["dnd","where"],
+            "eres":["ers"],
+            "eres tú": ["ers","ers2"],
             "hecho": ["exo","act"],
             "ellos": ["eys"],
             "fin de semana": ["finde","weekend"],
@@ -48,55 +49,140 @@ palabras = {"siempre": ['100pre',"always"],
             "cállate": ["kyat"],
             "mándame un mensaje luego": ["m1ml"],
             "misión imposible": ["mim"],
-            "mensaje": ["msj"],
+            "mensaje": ["msj","sms"],
             "mucho": ["mxo"],
             "no puedo hablar": ["nph","hello"],
+            "no pasa nada":["npn"],
             "para": ["pa"],
             "poco": ["pco"],
             "piérdete": ["pdt"],
             "por favor": ["pf","please"],
             "porqué": ["pq","xq"],
-            "que": ["q"],
+            "que": ["q","k"],
             "¿Qué haces?": ["q acs?"],
-            "hola": ["hla","hello"],
-            "hola": ["hla","hello"],
-
+            "se": ["c"],
+            "cámara": ["cam","hello"],
+            "cuando": ["cdo","qand","qando"],
+            "de": ["d"],
+            "dedos": ["d2"],
+            "dime": ["dim"],
+            "quedamos": ["qdms"],
+            "¡Qué plomo!": ["q plomo!"],
+            "¿Qué quieres?": ["q qrs?"],
+            "¡Qué risa!": ["q risa!"],
+            "¿sabes?": ["sbs?"],
+            "qué tal": ["q tal?"],
+            "saludos": ["salu2","goodbye"],
+            "espero": ["spro"],
+            "te": ["t"],
+            "¿Estás bien?": ["tas OK?"],
+            "también": ["tm","tmb"],
+            "te quiero": ["tqi"],
+            "tengo que irme": ["q tal?"],
+            "universidad": ["uni"],
+            "vosotros": ["vos?"],
+            "¿Vienes?": ["vns?"],
+            "¡Guapa!": ["wpa"],
+            "perdón?": ["xdon","sorry"],
+            "por favor": ["xfa","please"],
+            "¿Vienes?": ["vns?"],
+            "pero":['xo','but'],
+            "llámame":["ymam","ymm"],
+            "dormir":['zzz'],
             }
 
-""""
-— What are you doing?
-qand, qando — cuando, cuándo — when
-qdms — quedamos — we're staying
-q plomo! — ¡Qué plomo! — What a drag!
-q qrs? — ¿Qué quieres? — What do you want?
-q risa! — ¡Qué risa! — What a laugh!
-q sea — qué sea — whatever
-q tal? — qué tal — What's happening?
-salu2 — saludos — hello, goodbye
-sbs? — ¿sabes? — Do you know?
-sms — mensaje — message
-spro — espero — I hope
-t — te — you (as object pronoun)
-tas OK? — ¿Estás bien? — Are you OK?
-tb — también — also
-tq — te quiero — I love you
-tqi — tengo que irme — I have to leave
-uni — universidad — university, college
-vns? — ¿Vienes? — Are you coming?
-vos — vosotros — you (plural)
-wpa — ¡Guapa! — Sweet!
-xdon — perdón — sorry
-xfa — por favor — please
-xo — pero — but
-xq — porque, porqué — because, why
-ymam, ymm — llámame — call me
-zzz — dormir — sleeping
-+ — más — more
-:) — feliz, alegre — happy
-:( — triste — sad
-+o- — más o menos — more or less
-- — menos — less
-:p — sacar lengua — tongue sticking out
-;) — guiño — wink
 
-"""
+
+emoticons = {":-)": "Felicidad sorpresa sonrisa",
+             ":d":"Feliz",
+             ":-D": "Me muero de risa",
+             ":'-)": "Muy feliz",
+             ":-(": "Triste",
+             ":'-(": "Muy triste",
+             ":-O": "Asombrado",
+             ":-P": "Sacando la lengua",
+             ";-)": "Sarcástico, guiñando un ojo",
+             ":)": "Niño",
+             ":(": "Niño triste",
+             ":'(": "Niño llorando",
+             ":-Q:": "Fumador",
+             ":*)": "Borracho",
+             "8-x": "Besucón",
+             "8-)": "Con gafas",
+             "[8-)": "Con gafas y pelo cepillo",
+             "B-)": "Con gafas de sol",
+             "B:-)": "Con gafas de sol en la cabeza",
+             "::-)": "Con gafas normales en la cabeza",
+             "{:-)": "Con tupé",
+             ":-7": "Haciendo una mueca",
+             ":-d": "Sacando la lengua",
+             ":-{)": "Con bigote",
+             ":-{}": "Con los labios pintados",
+             ":-)~": "Babea",
+             ":-~)": "Con moquillo",
+             ":-@": "Gritando",
+             ":-#": "Lleva tirantes",
+             "P-)": "Guiñando un ojo II",
+             ":'(": "Llorando",
+             ":>)": "Narigudo",
+             "8<:)": "Narigudo II",
+             ":^)": "Nariz rota",
+             ":v)": "Nariz rota en la otra dirección",
+             ":_)": "Nariz deslizando fuera de la cara",
+             ":=)": "Dos narices",
+             "C8>[": "Calvo (por eso está triste)",
+             ":-=": "Vampiro",
+             ":-[": "Vampiro II",
+             "D-]": "Cíclope",
+             "S-{": "Mareado (o borracho II)",
+             "|)": "Japonés",
+             "<|-)": "Chino",
+             "<|-(": "A este chino no le gustan estas bromas",
+             ":0]": "Payaso",
+             ">:-[": "Cabreado",
+             ">>:-0": "Muy cabreado (cabreadísimo)",
+             ":-1": "Relamiéndose",
+             "<:-|": "Sereno  (¿?)",
+             "=8-{}": "Asustado",
+             "|-I": "Dormido",
+             "|-O": "Bostezando",
+             ":-?": "Fuma pipa",
+             ":-D": "Riéndose  (de alguien)",
+             "C=:-)": "Cocinero",
+             ":-I": "Indiferente",
+             "(-:": "Zurdo",
+             "[:]": "Robot",
+             ":-&": "Con la lengua atada",
+             "-:-)": "Punky",
+             "-:-(": "El buen punky no ríe",
+             "O:-)": "Soy un santo",
+             "};-)": "Diablillo",
+             ">:->": "Diabólico",
+             ">;->": "Diabólico y sarcástico",
+             ":-]": "Simplemente contento",
+             ":-$": "Hablando de dinero",
+             "8-*": "Ooops ...qué he dicho!",
+             ":-X": "Prefiero no decir nada. Me voy a callar",
+             ":-/": "Escéptico. No me lo creo",
+             "*-)": "En las nubes",
+             ":->": "Después de hacer una gracia",
+             ":-9": "Relamiéndose",
+             "[:-)": "Con un walkman",
+             "(:I": "Intelectualoide",
+             "<:-I": "Zopenco",
+             "@:-)": "Con turbante",
+             ":-0": "No gritar",
+             ":-:": "Smiley mutante",
+             ".-)": "Solo tiene un ojo",
+             "X-(": "Muerto",
+             "8:-)": "Hechicero",
+             ":]": "Enanillo amistoso",
+             "%-)": "Cara que se le queda a un usuario de pantalla verde",
+             ":*)": "El usuario está bebido",
+             "+-:-)": "El Papa, o de alguna orden religiosa",
+             "`:-)": "Se ha afeitado las cejas",
+             ",:-)": "Se ha afeitado las cejas II",
+             "@=": "A favor de la guerra nuclear",
+             "E-:-)": "Operador de Ham Radio",
+             "@--->---": "Una flor"
+             }
