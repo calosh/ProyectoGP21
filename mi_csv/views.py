@@ -38,12 +38,21 @@ def reemplazarAbbrPorPalabra(text):
     return text
 
 def reemplazarEmoticon(text):
+    emociones = []
+    try:
+        for i in emoticons:
+            if i in text:
+                emociones.append(emoticons[i])
+        return emociones
+    except Exception, e:
+        return ""
+
+def eliminarEmoticon(text):
     for i in emoticons:
         if i in text:
-            return emoticons[i]
-            break
-    return
-
+            text = text.replace(i,"") 
+    
+    return text
 
 def eliminarMenciones(cadena):
     bandera = True
@@ -63,24 +72,14 @@ def eliminarMenciones(cadena):
     return cadena
 
 def eliminarUltimoHastag(text):
+    tokens = tknzr.tokenize(text)
     try:
-        i = len(text)-1
-        j=0
-        cadena = ""
-        lista = []
-        while j<=i and text[i]!=" ":
-            lista.append(text[i])
-            i-=1
-        cadena = cadena.join(lista)
-        if cadena[-1]=="#":
+        a = tokens[-1]
+        if a[0] == "#":
             return 1
         else:
             return 0
-    except IndexError:
-        print "IndexError "
-        return 1
-    except Exception:
-        print "Otro Error Desconocido"
+    except:
         return 1
 
 def eliminar_emoticons(text):
@@ -111,8 +110,7 @@ def eliminar_urls(text):
 def normalizar_palabras(text):
     text = reemplazarAbbrPorPalabra(text)
     # http://stackoverflow.com/questions/10982240/how-can-i-remove-duplicate-letters-in-strings
-    # text = re.sub(r'(\w)\1+', r'\1', text) # NOrmalizar Palabras gooool-->gol
-    
+    #text = re.sub(r'(\w)\1+', r'\1', text) # NOrmalizar Palabras gooool-->gol
     # http://stackoverflow.com/questions/16453522/how-can-i-detect-laughing-words-in-a-string/16453690#16453690
     # Normalizar risas jajajaj o ejejej --> jaja
     return re.sub(r'\b(?:(a|e|i|o|u)*(?:ja|je|ji|jo|ju)+j?|(?:j+(a|e|i|o|u)+)+j+)\b','jaja',text, flags=re.I)
@@ -140,8 +138,11 @@ def index_normalizacion(request):
         cont = 0
         for i in rows:
             twett = ""
+            emj = []
             try:
                 twett= twett.join(i[6])
+                emj = reemplazarEmoticon(twett)
+                twett = eliminarEmoticon(twett)
                 twett = normalizar_palabras(twett)
             except IndexError, e:
                 continue
@@ -175,17 +176,13 @@ def index_normalizacion(request):
             except IndexError:
                 retweet_count = 0
 
-            emj = reemplazarEmoticon(twett)
-            if(emj==None):
-                emj = ""
-
             # Si no existe twett
             if len(twett)<5:
                 # twett vacio, fijamos twett = "via @" para terminar el proceso
                 twett = "vía @"
-
+            auxT= eliminar_urls(twett)
             # Si RT o via @ o # esta al principio se elimina el twett Vía Gcgisela
-            if "RT" in twett[0:3] or "via @" in twett or "vía @" in twett or "Vía @" in twett or twett[0]=="#" or eliminarUltimoHastag(twett)==1:
+            if "RT" in twett[0:3] or "via @" in twett or "vía @" in twett or "Vía @" in twett or twett[0]=="#" or eliminarUltimoHastag(auxT)==1:
                 pass
             else:
                 # Eliminio emoticons
@@ -202,7 +199,6 @@ def index_normalizacion(request):
 
                     # Elimino la url del tweet
                     twett=eliminar_urls(twett)
-                    twett=eliminarUltimoHastag(twett)
                     twett=eliminarMenciones(twett)
                     # Si se encuentra una coincidencia del twett con el contenido de la url
                     busqueda_tweet = body.find(twett)
@@ -231,7 +227,6 @@ def index_normalizacion(request):
                         body = soup.find('body')
                         # Elimino la url del tweet
                         twett=eliminar_urls(twett)
-                        twett=eliminarUltimoHastag(twett)
                         twett=eliminarMenciones(twett)
 
                         busqueda_tweet = body.find(twett)
@@ -241,32 +236,22 @@ def index_normalizacion(request):
                         else:
                             cont=cont+1
                             print "%d %s" %(cont, twett)
-                            emj = reemplazarEmoticon(twett)
-                            if(emj==None):
-                                emj = ""
                             #twett=normalizar_risas(twett)
                             writer.writerow([id_tweet,twett,usuario, favorite_count, retweet_count, nombre.encode('utf8'),emj])
                     # Si no se encuentra la url en el twett
                     except Exception:
                         twett=eliminar_urls(twett)
-                        twett=eliminarUltimoHastag(twett)
                         twett=eliminarMenciones(twett)
                         cont=cont+1;
                         print "%d %s" %(cont, twett)
-                        emj = reemplazarEmoticon(twett)
-                        if(emj==None):
-                            emj = ""
                         #twett=normalizar_risas(twett)
                         writer.writerow([id_tweet,twett,usuario, favorite_count, retweet_count, nombre.encode('utf8'),emj])
 
                 else:
                     # Se imprimer el twett
                     twett=eliminar_urls(twett)
-                    twett=eliminarUltimoHastag(twett)
                     twett=eliminarMenciones(twett)
                     cont=cont+1
-                    if(emj==None):
-                        emj = ""
                     print "%d %s" %(cont, twett)
                     #twett=normalizar_risas(twett)
                     writer.writerow([id_tweet,twett,usuario, favorite_count, retweet_count, nombre.encode('utf8'),emj])
