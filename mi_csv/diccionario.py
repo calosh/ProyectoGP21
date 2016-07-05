@@ -89,6 +89,75 @@ palabras = {"siempre": ['100pre',"always"],
             "pero":['xo','but'],
             "llámame":["ymam","ymm"],
             "dormir":['zzz'],
+
+            # Aegentina
+            'What’s up?':['¿Qué onda?','¿Como va?'],
+            'Cool people':['Piola (adj.)','escrachado/escrachar (verb)'],
+            'I love you':['te quiero mucho'],
+            'Boy':['Pibe'],
+            'Guy/Dude':['Chabón'],
+            'Taxi':['Tacho'],
+            #Chile
+            'What’s up?':['¿Qué más? ','¿Qué hubo?'],
+            'Be careful!/Watch out!':['¡Ojo!'],
+            'Be careful!':['¡Pilas!'],
+            'Ridiculous/uncool':['Mañé'],
+            'Anger':['Piedra'],
+            'Black coffee':['Tinto'],
+            'Police Officer':['Tombo'],
+            
+            #Cuba
+            'How are you doing?':['¿Que es la que hay?'],
+            'insanely in love with someone / an act of desperation':['mate'],
+            'cute/pretty':['mono'],
+            'cents/dollars/money':['chavos'],
+            
+            #Guatemala
+            'What’s up':['¿Qué onda!'],
+            'Cool':['Calidá'],
+            'Dude/Idiot':['Cerote/Pizado'],
+            'I love you lots':['Te quiero mucho'],
+            'Boy':['Wirito/Gúirito'],
+            'Guy':['Chavo'],
+            'Teen girl':['Chava'],
+            
+            #Mexico
+            'What’s up?':['¿Qué Huele?'],
+            'Preppie/snob/spoiled brat':['Fresa'],
+            'Watch out!':['Aguas'],
+            'cool':['Chido'],
+            'That’s tight':['Qué padre'],
+            'Dude (sometimes pejorative)':['Güey'],
+            'What did you say? / Pardon me':['Mande'],
+            'Give me a break!':['¡Chale!'],
+
+            # Spain
+            'What’s up':['¿Qué pasa?'],
+            'No way!':['¡Ni di coña!'],
+            'Tourist from North Europe':['Guiri'],
+            'Delinquent / pretty theif':['Quinqui/Kinki'],
+            'Dude':['Tio / Tia'],
+            
+            #Peru
+            'What’s up?':['¿Que cuentas?'],
+            'true':['la firme'],
+            'achorado':['defiant'],
+            'los vidrios':['see you'],
+            'work':['chamba'],
+            'bro/dude':['Pata'],
+            'jacket':['chompa'],
+            'show off':['figureti'],
+
+            # Venezuela
+            'squeeze/group together!':['Arrecochínense!'],
+            'Get smart! / straighten up!':['¡Avíspate!'],
+            'fat belly':['Caucho'],
+            'Junk food/quick lunch':['Bala fria'],
+            'Awesome':['Candela'],
+            'Hangover':['Ratón'],
+            'To court someone':['Echar los perros'],
+            'French Kiss':['Lata'],
+
             }
 
 
