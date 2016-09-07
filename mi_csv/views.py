@@ -59,11 +59,14 @@ def eliminarMenciones(cadena):
     while(bandera):
         posicion = cadena.find("@")
         if posicion!=-1:
-            cad = cadena[posicion]+cadena[posicion+1]
-            may = cadena[posicion+1]
-            may = may.capitalize()
-
-            cadena = cadena.replace(cad,may)
+            try:
+                cad = cadena[posicion]+cadena[posicion+1]
+                may = cadena[posicion+1]
+                may = may.capitalize()
+                cadena = cadena.replace(cad,may)
+            except IndexError, e:
+                cadena = cadena.replace("@", "")
+                return cadena
         else:
             bandera=False
     cadena = cadena.replace("#", "")
